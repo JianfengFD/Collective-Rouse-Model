@@ -51,4 +51,5 @@ In this alternative command, the values
 $M_0,\omega_0,G_0,\nu,\sigma_0,\sigma_1,M_w=[84.21,7.895,6.6855,0.5676,1.377,0.467,201]$ represent the provided model-controlled parameters."
 
 ![fig2](PB92.PNG)
+
 Figure 2 Storage- and loss-modulus curves for different molecular weights obtained by MRD (solid lines) and experiments (symbols), respectively. In this example, the red lines correspond to calibrated storage- and loss-modulus curves.
