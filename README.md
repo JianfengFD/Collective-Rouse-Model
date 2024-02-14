@@ -25,7 +25,7 @@ At the end, `NNCali.py` produces a calibrated figure, model parameters, and the 
 
 As shown in Fig. 1, it shows the curves at different optimizing steps with different MSE values.
 
-
+![fig1](PB92_MSEs.PNG)
 
 Figure 1 Storage- and loss- modulus curves at different fine-tuning stages. The dash light blue curve is given directly by neural network.
 
@@ -50,5 +50,5 @@ python NNGps.py -i [84.21,7.895,6.6855,0.5676,1.377,0.467,201] -M 20.7K 44.1k 97
 In this alternative command, the values 
 $M_0,\omega_0,G_0,\nu,\sigma_0,\sigma_1,M_w=[84.21,7.895,6.6855,0.5676,1.377,0.467,201]$ represent the provided model-controlled parameters."
 
-
+![fig2](PB92.PNG)
 Figure 2 Storage- and loss-modulus curves for different molecular weights obtained by MRD (solid lines) and experiments (symbols), respectively. In this example, the red lines correspond to calibrated storage- and loss-modulus curves.
