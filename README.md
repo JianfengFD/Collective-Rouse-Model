@@ -18,6 +18,7 @@ python NNCali.py -f GP_PB92_201K.csv -M 201k -o PB92
 - `GPGPP.csv` is the file containing your G-primes data of $G'-\omega,G''-\omega$ curves.
 - `540k` (or `540000`) specifies the molecular weight (M_w) of the polymer being studied.
 - `PB92` designates the output filename 'PB92PARA.pkl'. If you don't specify this, the default will be 'GpsModel'.
+- If you are satisfied with the fitting, you have the option to terminate the refining process during the calibration. Refined model parameters will be saved at intervals of every 1000 iterations.
 
 Upon execution, `NNCali.py` first employs our novel linear modified Rouse model (MRD) to swiftly determine an initial set of parameters that fit your provided data. This process is powered by a neural network. Subsequently, the program minimizes the Mean Squared Error (MSE) between the curves from the model and the experimental data. This refinement process is akin to a Monte-Carlo simulation approach.
 
