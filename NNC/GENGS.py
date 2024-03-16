@@ -17,7 +17,7 @@ import random
 
 
 
-def GEN_GS(nu,Mw,sig0,sig1,WinGp,WinGpp):
+def GEN_GS(nu,Mw,sig0,sig1,WinGp,WinGpp,SYMZ):
     Me = 12.96
     M=[125/Me,750/Me,2540/Me]
     M=np.array(M)
@@ -34,8 +34,8 @@ def GEN_GS(nu,Mw,sig0,sig1,WinGp,WinGpp):
     n_input2 = int(gam*np.log(Mw/M0))+1
     ratio1 = abs(n_real-n_input2)
     ratio2 = abs(n_real-n_input1)
-    TAU_ALL1, zeta_out1 = Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_input1)
-    TAU_ALL2, zeta_out2 = Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_input2)
+    TAU_ALL1, zeta_out1 = Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_input1,SYMZ)
+    TAU_ALL2, zeta_out2 = Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_input2,SYMZ)
 
 
     detxy=[0.0,0.0]
@@ -75,7 +75,7 @@ def GEN_GS(nu,Mw,sig0,sig1,WinGp,WinGpp):
     return np.log10(WsGp),np.log10(Gp),np.log10(WsGpp),np.log10(Gpp)
 
 
-def GEN_GS_X(nu,Mw,sig0,sig1,DX,DY,X1,X2):
+def GEN_GS_X(nu,Mw,sig0,sig1,DX,DY,X1,X2,SYMZ):
     Me = 12.96
     M=[125/Me,750/Me,2540/Me]
     M=np.array(M)
@@ -92,8 +92,8 @@ def GEN_GS_X(nu,Mw,sig0,sig1,DX,DY,X1,X2):
     n_input2 = int(gam*np.log(Mw/M0))+1
     ratio1 = abs(n_real-n_input2)
     ratio2 = abs(n_real-n_input1)
-    TAU_ALL1, zeta_out1 = Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_input1)
-    TAU_ALL2, zeta_out2 = Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_input2)
+    TAU_ALL1, zeta_out1 = Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_input1,SYMZ)
+    TAU_ALL2, zeta_out2 = Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_input2,SYMZ)
 
 
     detxy=[0.0,0.0]

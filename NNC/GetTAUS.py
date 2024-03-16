@@ -32,13 +32,20 @@ def plot_zeta(zeta,n,ne):
 
 
 
-def Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_heavy):
-    gam = (nn[2]-nn[0])/np.log(M[2]/M[0])
-    M0 = M[0]*np.exp(-nn[0]/gam)
-
-
+def Cal_TAUS(M,M0,nn0,ZIM_LIST,SIG,n_heavy,SYMZ):
+    gam = (nn0[2]-nn0[0])/np.log(M[2]/M[0])
+    M0 = M[0]*np.exp(-nn0[0]/gam)
 
     n0=np.log(1/M0)*gam
+    def get_seq(n):
+        # 生成初始序列
+        seq = list(range(n))
+        # 按照指定规则重排
+        left_seq = seq[::2]  # 隔一个取一个
+        right_seq = seq[1::2][::-1]  # 取剩下的，并反转
+        # 拼接两部分
+        seq = left_seq + right_seq
+        return seq
 
     def Cnk(n,k):
         return gamma(n+1)/gamma(k+1)/gamma(n-k+1)
@@ -138,7 +145,7 @@ def Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_heavy):
 
     detxy=[5.35+0.105,4.05-0.1]
 
-    n=28
+
     ne=4
     detm=1
     sig=0.1
@@ -159,10 +166,7 @@ def Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_heavy):
     Me0=n0*ne
     TAU_ALL=[]
 
-
-
     for  n in range(n_heavy,n_heavy+1):
-
         #n = int((MW/M0)**gam)
         #n = int(gam*np.log(MW/M0))
         MW=np.exp(n/gam)*M0
@@ -175,6 +179,12 @@ def Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_heavy):
         ker = ker/np.max(ker)
         kerED =ker_LR[K]
         N=int(n*ne)+1
+        """
+         SYMZ
+         """
+        nn = n//2
+        nne = 8
+        J = N - nn*nne - 1
         zeta = np.ones(N,dtype=np.float64)/zeta0
 
         """
@@ -190,8 +200,19 @@ def Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_heavy):
             c = np.exp(np.log(c1)*al+np.log(c2)*(1-al))
             zetaALL.append(c)
             zeta[k*ne]= 1/c #gamma(k+1)*gamma(n-k+1)/gamma(n+1)
+        """
+        SYMZ
+        """
+        zetaALL_SYMZ = []
+        seq=get_seq(nn)
+        #print('seq,nn:',seq,nn)
+        #a=input('check seq')
+        for k in seq:
+            zetaALL_SYMZ.append(zetaALL[k])
+
 
         zeta_sig = Get_Zeta_Sig(zetaALL,zeta0,n,ne,sig,dist_type=DIST_TYPE,detm=detm)
+
         Z_leftM = np.eye(N, dtype=np.float64)*zeta0n
         # Modify Z_leftM
         for i in range(N):
@@ -200,7 +221,6 @@ def Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_heavy):
             else:
                 if i>=len(kerED[0]) and N-1-i>=len(kerED[0]):
                     for j in range(len(ker)):
-
                         Z_leftM[i,i-len(ker)//2+j] += ker[j]*zeta_sig[i]
                 if i<len(kerED[0]):
                     for j in range(i+1+len(ker)//2):
@@ -209,8 +229,24 @@ def Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_heavy):
                     for j in range(N-1-i+1+len(ker)//2):
                         Z_leftM[i,i-len(ker)//2+j]+=kerED[1][N-1-i][j]*zeta_sig[i]
 
+        Z_leftM_SYMZ = np.eye(N, dtype=np.float64)*zeta0n
+        for i in range(nn):
+            for j in range(len(ker)):
+                I = i*nne+1 - len(ker)//2+j
+                Z_leftM_SYMZ[i*nne+1,I] = ker[j]*zetaALL_SYMZ[i]
+                Z_leftM_SYMZ[I,i*nne+1] = Z_leftM_SYMZ[i*nne+1,I]
+                if I!=i*nne+1:
+                    Z_leftM_SYMZ[I,I] = - Z_leftM_SYMZ[i*nne+1,I]+zeta0
+                if I==i*nne+1:
+                    Z_leftM_SYMZ[i*nne+1,I] = ker[j]*zetaALL_SYMZ[i] +zeta0
 
-        Z_leftM_sparse = csc_matrix(Z_leftM)
+        """
+        ******** IMPORTANT *****************
+        Replacing Z_leftM_SYMZ with Z_leftM will make the program back to the non-symz mode.
+        """
+
+        if SYMZ==True:Z_leftM_sparse = csc_matrix(Z_leftM_SYMZ)
+        if SYMZ==False:Z_leftM_sparse = csc_matrix(Z_leftM)
         Z_leftM_inverse = inv(Z_leftM_sparse).todense()
 
 
@@ -275,7 +311,7 @@ def Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_heavy):
                     tau_Rouse[i]=tau1/(i+1)**(3*NU_ZIMM)
 
 
-    
+        #print(tau[0:10])
 
         tau0=tau_Cnk0
         p=np.reshape(np.array(range(N-1))+1,(N-1,1))
@@ -303,8 +339,5 @@ def Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_heavy):
             MW_ALL.append(np.exp(n/gam)*M0)
             #MW_ALL.append(n**(1/gam)*M0)
             TAU_ALL.append([n,np.exp(n/gam)*M0,N,[tau_Cnk,tau_Rouse,tau_Rouse]])
-
-
-
 
     return TAU_ALL,np.array(1/zeta)
