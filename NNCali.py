@@ -27,12 +27,13 @@ parser.add_argument('-th', '--thres', type=float, default=0.001, help="size of o
 
 parser.add_argument('-dw', '--dw', type=float, default=0, help="translation of omega")
 parser.add_argument('-dG', '--dG', type=float, default=0, help="translation of modulus")
-
+parser.add_argument('-sz', '--SYMZ', type=bool, default=False, help="Switch between symmetric Z and non-symmetric z")
 args = parser.parse_args()
 ratedP= args.optstep
 dw=args.dw;dG=args.dG
 dP=[dp*ratedP for dp in dP]
 Thres_MSE=args.thres
+SYMZ = args.SYMZ
 
 filename = args.output
 # Convert molecular weight to float format
@@ -198,7 +199,7 @@ sig1_low=func_SIG(sig0)
 Y0=[0,sig1_low,0.3,np.log(5)]
 sig0,sig1,nu,Mw=[Y_pred1[i]+Y0[i] for i in range(4)]
 Mw =np.exp(Mw)
-W1,Gp,W2,Gpp = GEN_GS(nu,Mw,sig0,sig1,[-7,-1],[-7,-1])
+W1,Gp,W2,Gpp = GEN_GS(nu,Mw,sig0,sig1,[-7,-1],[-7,-1],SYMZ)
 
 W1,Gp,W2,Gpp =[np.reshape(W1,(-1)),np.reshape(Gp,(-1)),np.reshape(W2,(-1)),np.reshape(Gpp,(-1))]
 print(sig0,sig1,nu,Mw)
@@ -209,7 +210,7 @@ W2=W2 + Y_pred2[0]
 Gp+=Y_pred2[1]
 Gpp+=Y_pred2[1]
 DX= Y_pred2[0];DY=Y_pred2[1]
-Gp,Gpp=GEN_GS_X(nu,Mw,sig0,sig1,DX,DY,X1,X2)
+Gp,Gpp=GEN_GS_X(nu,Mw,sig0,sig1,DX,DY,X1,X2,SYMZ)
 plt.plot(X1,Y1,'<')
 plt.plot(X2,Y2,'D')
 plt.plot(X1,Gp,color='lightblue',linestyle='--',label='Est. by ML')
@@ -227,7 +228,7 @@ def MSEG(Gp,Gpp,YG1=Y1,YG2=Y2):
 PARA = [nu,np.log(Mw),sig0,sig1,DX,DY]
 dP =[0.01,0.005,0.01,0.01,0.02,0.02]
 Gp,Gpp=GEN_GS_X(PARA[0],np.exp(PARA[1]),PARA[2],PARA[3],
-            PARA[4],PARA[5],X1,X2)
+            PARA[4],PARA[5],X1,X2,SYMZ)
 mse = MSEG(Gp,Gpp)
 
 print('alpha','Mw','sig0','beta','DX','DY')
@@ -246,7 +247,7 @@ for i in range(1,20000):
     PARAJ = PARA[J]
     PARA[J]+= dP[J]*(np.random.rand()-0.5)*2
     Gp,Gpp=GEN_GS_X(PARA[0],np.exp(PARA[1]),PARA[2],PARA[3],
-                PARA[4],PARA[5],X1,X2)
+                PARA[4],PARA[5],X1,X2,SYMZ)
     mse_NEW = MSEG(Gp,Gpp)
     if mse <  MSEG(Gp,Gpp):
         PARA[J]=PARAJ

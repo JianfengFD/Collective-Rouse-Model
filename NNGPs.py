@@ -55,11 +55,13 @@ parser.add_argument('-B', '--bd', type=str, default='0',nargs='+', help="A list 
 
 parser.add_argument('-dw', '--dw', type=float, default=0, help="translation of omega")
 parser.add_argument('-dG', '--dG', type=float, default=0, help="translation of modulus")
+parser.add_argument('-sz', '--SYMZ', type=bool, default=False, help="Switch between symmetric Z and non-symmetric z")
 
 
 args = parser.parse_args()
 bds = [ast.literal_eval(l) for l in args.bd]
 dw=args.dw;dG=args.dG
+SYMZ = args.SYMZ
 #parser.add_argument('-s', '--optstep', type=float, default=1.0, help="size of optimized step")
 #parser.add_argument('-th', '--thres', type=float, default=0.001, help="size of optimized step")
 
@@ -239,8 +241,8 @@ for Mw,bds_M in zip(Mws,bds):
 
     ratio1 = abs(n_real-n_input2)
     ratio2 = abs(n_real-n_input1)
-    TAU_ALL1, zeta_out1 = Cal_TAUS(gam,M0,ZIM_LIST,SIG,n_input1)
-    TAU_ALL2, zeta_out2 = Cal_TAUS(gam,M0,ZIM_LIST,SIG,n_input2)
+    TAU_ALL1, zeta_out1 = Cal_TAUS(gam,M0,ZIM_LIST,SIG,n_input1,SYMZ)
+    TAU_ALL2, zeta_out2 = Cal_TAUS(gam,M0,ZIM_LIST,SIG,n_input2,SYMZ)
 
     #ni = ni*MWALL/sum(ni*MWALL)
 
