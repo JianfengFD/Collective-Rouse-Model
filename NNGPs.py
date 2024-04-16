@@ -8,8 +8,7 @@ from scipy.sparse import csc_matrix
 from scipy.sparse.linalg import spsolve
 from scipy.sparse.linalg import inv
 import pickle
-#from MW_DIST import *
-from NNG.GetTAUS_PB import *
+from NNG.GetTAUS import *
 import pickle
 import argparse
 from pylab import *
@@ -19,11 +18,11 @@ from scipy.special import erf
 from scipy.optimize import fsolve
 import csv
 
-# 使用matplotlib的tab10颜色系列
+
 tab_colors = plt.cm.tab10.colors
-# 为每种颜色提供两个连续条目
+
 doubled_colors = [color for color in tab_colors for _ in range(2)]
-# 设置自定义颜色循环
+
 plt.rcParams['axes.prop_cycle'] = cycler(color=doubled_colors)
 
 Marker_ALL = ['o','v','^','<','>','s','p','*','H','+','x','D','P','X']
@@ -40,7 +39,7 @@ def get_m0_gam():
 
 
 def convert_molecular_weight(value):
-    # 如果值中包含'K'或者'k', 则乘以1000转换
+    # convert k or K to 1000
     if 'k' in value or 'K' in value:
 
         return float(value[:-1])
@@ -194,9 +193,6 @@ for filename in filenames:
 
 
 K=0
-#Mps =[34.5,61.2,115,260,670,3200]
-#Mws =[34,57.16,125,290,750,2740]
-#Me = 2.2cols_trimmed[i*4+1]
 
 Mws_rescale=[m*Me_rate for m in Mws]
 Me = Mws[0]/Mws_rescale[0]
@@ -210,7 +206,7 @@ M25,sig0_25=[20,0.40]
 alph = (sig0-sig0_25)/(np.log(Mw_true)-np.log(M25))**2
 bet =sig0_25
 det_sig1 = sig1 - func_SIG(sig0)-(Mw_true-30)/120*0.08
-#Det_Sig = Det_Sig*(Det_Sig>0)
+
 sig0_TYPE = 'GELU'
 slope_sig0= (sig0-0.42)/((np.tanh((np.log(Mw_true)-4.5))+1)/2.0)
 if sig0>0.42 and np.log10(Mw_true)>1.5:
@@ -222,7 +218,6 @@ gam,M0=get_m0_gam()
 K=0
 GPS_TH=[]
 for Mw,bds_M in zip(Mws,bds):
-    #SIG0=Get_Sig0(alph,bet,M25,Mw,Me)
     if sig0_TYPE=='slope':
         SIG0 = 0.42+(np.tanh((np.log(Mw/Me)-4.5))+1)/2.0*slope_sig0
     if sig0_TYPE=='GELU':
@@ -233,7 +228,6 @@ for Mw,bds_M in zip(Mws,bds):
     SIG =[SIG0,SIG1]
     ZIM_LIST[2] = Get_Nu(Nu,Mw_true,Mw,Me)
     print(Mw_true,Me,Mw)
-    #print(SIG0,SIG1,sig0_TYPE)
     n_real=gam*np.log(Mw/M0/Me)
 
     n_input1 = int(gam*np.log(Mw/M0/Me))
@@ -241,10 +235,9 @@ for Mw,bds_M in zip(Mws,bds):
 
     ratio1 = abs(n_real-n_input2)
     ratio2 = abs(n_real-n_input1)
-    TAU_ALL1, zeta_out1 = Cal_TAUS(gam,M0,ZIM_LIST,SIG,n_input1,SYMZ)
-    TAU_ALL2, zeta_out2 = Cal_TAUS(gam,M0,ZIM_LIST,SIG,n_input2,SYMZ)
+    TAU_ALL1, zeta_out1 = Cal_TAUS(gam,M0,ZIM_LIST,SIG,n_input1)
+    TAU_ALL2, zeta_out2 = Cal_TAUS(gam,M0,ZIM_LIST,SIG,n_input2)
 
-    #ni = ni*MWALL/sum(ni*MWALL)
 
     logwA=np.reshape(linspace(bds_M[0],bds_M[1],100),(1,100))
     Gp = np.zeros_like(logwA)
@@ -257,23 +250,16 @@ for Mw,bds_M in zip(Mws,bds):
     for TAU_ALL,zeta_out,ratio in [[TAU_ALL1,zeta_out1,ratio1],[TAU_ALL2,zeta_out2,ratio2]]:
         for n,MW,N,TAU3 in TAU_ALL:
             tau_Cnk = TAU3[0]
-            tau_Rouse =TAU3[1]
-            tau_min=min(min(tau_Cnk),min(tau_Rouse))
+            taum =TAU3[1]
+            tau_min=min(min(tau_Cnk),taum)
             tau_Cnk=tau_Cnk/tau_min/10**detxy[0]
-            tau_Rouse=tau_Rouse/tau_min/10**detxy[0]
-
-            N_chain=np.sum(zeta_out)/10**detxy[1]
-            #Mw_RN=N_chain
+            N_chain=N
             Mw_RN=N/10**detxy[1]
 
             tau=tau_Cnk
 
             Gp+=  ratio*np.sum(W**2*tau**2/(1+W**2*tau**2),axis=0)/Mw_RN
             Gpp+= ratio*np.sum(W*tau/(1+W**2*tau**2),axis=0)/Mw_RN
-
-            tau=tau_Rouse
-            Gp +=  ratio*m_Rouse*np.sum(W**2*tau**2/(1+W**2*tau**2),axis=0)/Mw_RN
-            Gpp += ratio*m_Rouse*np.sum(W*tau/(1+W**2*tau**2),axis=0)/Mw_RN
 
     Gp=np.reshape(Gp,(-1))
     Gpp=np.reshape(Gpp,(-1))
@@ -287,21 +273,18 @@ for gp_exp,gpp_exp in zip(GP_EXP,GPP_EXP):
     plt.loglog(10**gpp_exp[0], 10**gpp_exp[1], marker=Marker_ALL[K],markersize=3, linestyle='', color='k', markerfacecolor='white')
     K+=1
 
-        #plt.ylim(2,6)
-        #plt.xlim(-5,5)
 
-#plt.legend()
 plt.xlabel('$\omega\\tau_1$')
 plt.ylabel('G`,G``')
 plt.savefig('data/'+Polytype+'.png',dpi=600)
 print('data/'+Polytype+'.png saved')
 
 data_for_csv = []
-# 重组数据
+
 J=0;col=['w','Gp','w','Gpp']
 columns=[]
 for item in GPS_TH:
-    # 首先添加前四个元素
+
     for i in range(4):
         data_for_csv.append(item[i])
         columns.append(col[i]+'_'+args.M[J])

@@ -71,8 +71,7 @@ class ResidualBlock(nn.Module):
         out = self.relu(out)
         return out
 
-# 定义两个ResNet模型
-# 创建RES1模型时添加L2正则化
+
 class RES1(nn.Module):
     def __init__(self):
         super(RES1, self).__init__()
@@ -81,7 +80,7 @@ class RES1(nn.Module):
             ResidualBlock(32, 64),
             ResidualBlock(64, 128, apply_pooling=True),
             nn.Flatten(),
-            nn.Linear(50 * 128, 256),  # 201经过两次pooling变为50
+            nn.Linear(50 * 128, 256),
             nn.ReLU(),
             nn.Linear(256, 4)
         )
@@ -108,7 +107,7 @@ class RES2(nn.Module):
 
 
 
-# 载入预训练模型
+# Load the models
 
 model1 = RES1()
 model2 = RES2()
