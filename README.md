@@ -1,5 +1,5 @@
-# Modified-Rouse-Model
-This project aims to fit the experimental $G'-\omega,G''-\omega$ curves for a given molecular weight and subsequently predict these curves for other molecular weights using a modified Rouse model proposed in our forthcoming publication.
+# Collective-Rouse-Model
+This project aims to fit the experimental $G'-\omega,G''-\omega$ curves for a given molecular weight and subsequently predict these curves for other molecular weights using a collective Rouse model (CRM) proposed in our forthcoming publication.
 
 ### Prerequisites
 
@@ -16,11 +16,11 @@ python NNCali.py -f GP_PB92_201K.csv -M 201k -o PB92
 ```
 
 - `GPGPP.csv` is the file containing your G-primes data of $G'-\omega,G''-\omega$ curves.
-- `540k` (or `540000`) specifies the molecular weight (M_w) of the polymer being studied.
+- `201k` (or `201000`) specifies the molecular weight (M_w) of the polymer being studied.
 - `PB92` designates the output filename 'PB92PARA.pkl'. If you don't specify this, the default will be 'GpsModel'.
 - If you are satisfied with the fitting, you have the option to terminate the refining process during the calibration. Refined model parameters will be saved at intervals of every 1000 iterations.
 
-Upon execution, `NNCali.py` first employs our novel linear modified Rouse model (MRD) to swiftly determine an initial set of parameters that fit your provided data. This process is powered by a neural network. Subsequently, the program minimizes the Mean Squared Error (MSE) between the curves from the model and the experimental data. This refinement process is akin to a Monte-Carlo simulation approach.
+Upon execution, `NNCali.py` first employs our novel linear CRD to swiftly determine an initial set of parameters that fit your provided data. This process is powered by a neural network. Subsequently, the program minimizes the Mean Squared Error (MSE) between the curves from the model and the experimental data. This refinement process is akin to a Monte-Carlo simulation approach.
 
 At the end, `NNCali.py` produces a calibrated figure, model parameters, and the $M_0$ value. You'll need these outputs for the predictive model, which can generate $G'\sim\omega,G''\sim\omega$ curves for other $M_w$ values.
 
@@ -53,4 +53,4 @@ $M_0,\omega_0,G_0,\nu,\sigma_0,\sigma_1,M_w=[84.21,7.895,6.6855,0.5676,1.377,0.4
 
 ![fig2](PB92.png)
 
-Figure 2 Storage- and loss-modulus curves for different molecular weights obtained by MRD (solid lines) and experiments (symbols), respectively. In this example, the red lines correspond to calibrated storage- and loss-modulus curves.
+Figure 2 Storage- and loss-modulus curves for different molecular weights obtained by CRD (solid lines) and experiments (symbols), respectively. In this example, the red lines correspond to calibrated storage- and loss-modulus curves.
