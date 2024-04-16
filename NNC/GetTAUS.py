@@ -120,8 +120,6 @@ def Cal_TAUS(M,M0,nn0,ZIM_LIST,SIG,n_heavy,SYMZ):
     zeta0 = 1.00
 
     MN_MAX,NU,ALPH =ZIM_LIST
-
-
     ker_ALL=[[1],[1,-1],[-1,2,-1],[-1,-2,6,-2,-1],[-1,2,-3,4,-3,2,-1]]
     ker_LR =[[],
             [],
@@ -146,32 +144,23 @@ def Cal_TAUS(M,M0,nn0,ZIM_LIST,SIG,n_heavy,SYMZ):
     detxy=[5.35+0.105,4.05-0.1]
 
 
-    ne=4
+    ne=12
     detm=1
     sig=0.1
-    m_rouse =2
 
     eta_ALL=[]
     MW_ALL=[]
-    #gam=1/5.15
-
-
     """
     当n0=5.813时,zeta0=1
-    Me0=n0*4
     其它n时，先求出MW
-    zeta0n= zeta0*MW*Me0/n/ne
+    zeta0n= zeta0*MW*n0/n
     """
-
-    Me0=n0*ne
     TAU_ALL=[]
 
     for  n in range(n_heavy,n_heavy+1):
-        #n = int((MW/M0)**gam)
-        #n = int(gam*np.log(MW/M0))
         MW=np.exp(n/gam)*M0
-        zeta0n= zeta0*MW*Me0/n/ne
-        lam = MW*Me0/n/ne
+        zeta0n= zeta0*MW*n0/n
+        lam = MW*n0/n
         zeta0n= zeta0
         k0 = 1.0
         #zeta0n=zeta0
@@ -183,7 +172,7 @@ def Cal_TAUS(M,M0,nn0,ZIM_LIST,SIG,n_heavy,SYMZ):
          SYMZ
          """
         nn = n//2
-        nne = 8
+        nne = ne*2
         J = N - nn*nne - 1
         zeta = np.ones(N,dtype=np.float64)/zeta0
 
@@ -249,9 +238,6 @@ def Cal_TAUS(M,M0,nn0,ZIM_LIST,SIG,n_heavy,SYMZ):
         if SYMZ==False:Z_leftM_sparse = csc_matrix(Z_leftM)
         Z_leftM_inverse = inv(Z_leftM_sparse).todense()
 
-
-
-
         Z=np.zeros((N,N),dtype=np.float64)
 
         Z[0,0],Z[0,1],Z[N-1,N-1],Z[N-1,N-2] = [-k0,k0,-k0,k0]
@@ -279,65 +265,15 @@ def Cal_TAUS(M,M0,nn0,ZIM_LIST,SIG,n_heavy,SYMZ):
         tau_Cnk=np.reshape(1/w[1:N],(N-1,1)) *lam**2
         tau_Cnk0=tau_Cnk[0]
 
-        """
-           TAU_Rouse
-        """
-        if ROUSE_NUMERICAL==True:
-            zeta = np.ones(N,dtype=np.float64)/zeta0
-            for k in range(n+1):
-                zeta[k*ne]= k0/zeta0 #gamma(k+1)*gamma(n-k+1)/gamma(n+1)
-
-            Z=np.zeros((N,N),dtype=np.float64)
-            Z[0,0],Z[0,1],Z[N-1,N-1],Z[N-1,N-2] = [zeta[0],-zeta[0],zeta[N-1],-zeta[N-1]]
-            for i in range(1,N-1):
-                Z[i,i-1],Z[i,i],Z[i,i+1]=[-1*zeta[i],2*zeta[i],-1*zeta[i]]
-            # Get the relaxation times
-            Z=Hmn @ Z
-            w, v = np.linalg.eig(Z)
-            w=np.sort(w)
-
-            k0=1.0
-            tau_Rouse=np.reshape(1/w[1:N],(N-1,1))*lam**2.0
-            tau_Rouse0=tau_Rouse[0]
-        else:
-            if Approx_type=='ROUSE_NONE':
-                tau_Rouse = np.zeros((N-1,1),dtype=np.float64)
-                for i in range(0,N-1):
-                        tau_Rouse[i]=zeta0n/k0/4/np.sin((i+1)*np.pi/2/(N))**2
-            if Approx_type=='ZIMM_v':
-                tau_Rouse = np.zeros((10000,1),dtype=np.float64)
-                for i in range(0,10000):
-                    tau1 = zeta0n/k0
-                    tau_Rouse[i]=tau1/(i+1)**(3*NU_ZIMM)
-
-
-        #print(tau[0:10])
-
+        mintau=lam**2.0/4
         tau0=tau_Cnk0
         p=np.reshape(np.array(range(N-1))+1,(N-1,1))
-
-
         logwA=np.reshape(linspace(-6-detxy[0],5-detxy[0],50),(1,50))
         W=10**logwA
         Ws=np.reshape(W,(-1))
 
-        tau=tau_Cnk
-        eta_temp=np.sum(tau,axis=0)/N
 
-        Gp =  np.sum(W**2*tau**2/(1+W**2*tau**2),axis=0)
-        Gpp = np.sum(W*tau/(1+W**2*tau**2),axis=0)
-
-        tau=tau_Rouse
-
-        Gp +=  m_rouse*np.sum(W**2*tau**2/(1+W**2*tau**2),axis=0)
-        Gpp += m_rouse*np.sum(W*tau/(1+W**2*tau**2),axis=0)
-        eta_temp+=np.sum(tau,axis=0)/N*2
-
-
-        if eta_temp>0:
-            eta_ALL.append(eta_temp/3)
-            MW_ALL.append(np.exp(n/gam)*M0)
-            #MW_ALL.append(n**(1/gam)*M0)
-            TAU_ALL.append([n,np.exp(n/gam)*M0,N,[tau_Cnk,tau_Rouse,tau_Rouse]])
+        MW_ALL.append(np.exp(n/gam)*M0)
+        TAU_ALL.append([n,np.exp(n/gam)*M0,N,[tau_Cnk,mintau]])
 
     return TAU_ALL,np.array(1/zeta)

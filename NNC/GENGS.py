@@ -36,12 +36,7 @@ def GEN_GS(nu,Mw,sig0,sig1,WinGp,WinGpp,SYMZ):
     ratio2 = abs(n_real-n_input1)
     TAU_ALL1, zeta_out1 = Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_input1,SYMZ)
     TAU_ALL2, zeta_out2 = Cal_TAUS(M,Me,nn,ZIM_LIST,SIG,n_input2,SYMZ)
-
-
     detxy=[0.0,0.0]
-
-
-
 
     #ni = ni*MWALL/sum(ni*MWALL)
     logwAGp=np.reshape(linspace(WinGp[0],WinGp[1],50),(1,50))
@@ -52,24 +47,18 @@ def GEN_GS(nu,Mw,sig0,sig1,WinGp,WinGpp,SYMZ):
     WsGp=np.reshape(WGp,(-1))
     WGpp=10**logwAGpp
     WsGpp=np.reshape(WGpp,(-1))
-    m_Rouse = 2
     i=0
 
     for TAU_ALL,zeta_out,ratio in [[TAU_ALL1,zeta_out1,ratio1],[TAU_ALL2,zeta_out2,ratio2]]:
         for n,MW,N,TAU3 in TAU_ALL:
             tau_Cnk = TAU3[0]
-            tau_Rouse =TAU3[1]
-            tau_min=min(min(tau_Cnk),min(tau_Rouse))
+            tau_min=min(min(tau_Cnk),TAU3[1])
             tau_Cnk=tau_Cnk/tau_min
-            tau_Rouse=tau_Rouse/tau_min
-            N_chain=np.sum(zeta_out)
-            Mw_RN=N_chain
+            Mw_RN=N
             tau=tau_Cnk
             Gp+=  ratio*np.sum(WGp**2*tau**2/(1+WGp**2*tau**2),axis=0)/Mw_RN
             Gpp+= ratio*np.sum(WGpp*tau/(1+WGpp**2*tau**2),axis=0)/Mw_RN
-            tau=tau_Rouse
-            Gp +=  ratio*m_Rouse*np.sum(WGp**2*tau**2/(1+WGp**2*tau**2),axis=0)/Mw_RN
-            Gpp += ratio*m_Rouse*np.sum(WGpp*tau/(1+WGpp**2*tau**2),axis=0)/Mw_RN
+
 
 
     return np.log10(WsGp),np.log10(Gp),np.log10(WsGpp),np.log10(Gpp)
@@ -111,24 +100,20 @@ def GEN_GS_X(nu,Mw,sig0,sig1,DX,DY,X1,X2,SYMZ):
     WsGp=np.reshape(WGp,(-1))
     WGpp=10**logwAGpp
     WsGpp=np.reshape(WGpp,(-1))
-    m_Rouse = 2
+    m_Rouse = 0 #2
     i=0
 
     for TAU_ALL,zeta_out,ratio in [[TAU_ALL1,zeta_out1,ratio1],[TAU_ALL2,zeta_out2,ratio2]]:
         for n,MW,N,TAU3 in TAU_ALL:
             tau_Cnk = TAU3[0]
-            tau_Rouse =TAU3[1]
-            tau_min=min(min(tau_Cnk),min(tau_Rouse))
+            tau_min=min(min(tau_Cnk),TAU3[1])
             tau_Cnk=tau_Cnk/tau_min
-            tau_Rouse=tau_Rouse/tau_min
-            N_chain=np.sum(zeta_out)
+            N_chain=N #np.sum(zeta_out)
             Mw_RN=N_chain
             tau=tau_Cnk
             Gp+=  ratio*np.sum(WGp**2*tau**2/(1+WGp**2*tau**2),axis=0)/Mw_RN
             Gpp+= ratio*np.sum(WGpp*tau/(1+WGpp**2*tau**2),axis=0)/Mw_RN
-            tau=tau_Rouse
-            Gp +=  ratio*m_Rouse*np.sum(WGp**2*tau**2/(1+WGp**2*tau**2),axis=0)/Mw_RN
-            Gpp += ratio*m_Rouse*np.sum(WGpp*tau/(1+WGpp**2*tau**2),axis=0)/Mw_RN
+
 
 
     return np.reshape(np.log10(Gp)+DY,(-1)),np.reshape(np.log10(Gpp)+DY,(-1))
