@@ -34,6 +34,8 @@ Figure 1 Storage- and loss- modulus curves at different fine-tuning stages. The 
 
 Ensure that the domains of $log_{10}\omega$, $log_{10}G'$, and $log_{10}G''$ are all within the range of -10 and 10. If not, you can adjust the domain using the following command after the calibration and preceding prediction commands: `-dw 3 -dG 2`.
 
+Once the model parameters, such as $\sigma$, $\alpha$, and $\beta$, are obtained, they still implicitly depend on the molecular weight. This dependence is expressed as $\sigma(M;\sigma_0,M_0)$, where $\sigma(M_0;\sigma_0,M_0) = \sigma_0$. However, these dependencies have already been incorporated into the code, and no manual manipulation is required to adjust these parameters for other molecular weights.
+
 ### Prediction Command:
 
 ```
