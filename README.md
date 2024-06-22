@@ -44,14 +44,7 @@ python NNGps.py -i PB92 -f PBGP92.csv -M 20.7K 44.1k 97k 201k
 
 This command uses the model parameters from file 'PB92PARA.pkl' and produces the $G'-\omega,G''-\omega$ curves for $M_w=20.7k, 44.1k, 97k, 201k$. The corresponding experimental curves are taken from 'PBGP92.csv'. The '-f' flag is optional; if not specified, the program will only plot the predicted curves. The predicted curves will be stored in the file 'data/PB92_Theory.CSV' (or 'data/PB92_Theory.pkl').
 
-Alternatively, you can input the model parameters directly:
 
-```
-python NNGps.py -i [84.21,7.895,6.6855,0.5676,1.377,0.467,201] -M 20.7K 44.1k 97k 201k
-```
-
-In this alternative command, the values 
-$M_0,\omega_0,G_0,\nu,\sigma_0,\sigma_1,M_w=[84.21,7.895,6.6855,0.5676,1.377,0.467,201]$ represent the provided model-controlled parameters."
 
 ![fig2](PB92.png)
 
