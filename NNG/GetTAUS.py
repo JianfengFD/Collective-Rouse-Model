@@ -9,6 +9,11 @@ from scipy.sparse.linalg import spsolve
 from scipy.sparse.linalg import inv
 import pickle
 
+# NOTE: the algorithm employed in this code is slightly different from the CRD paper 
+# in order to make the program more robust. Here, the model parameters beta and sigma 
+# will be automatically determined by the program other than to be fitted to the experimental curve which
+# makes the program more powerful in the prediction.
+
 def Cal_TAUS(gam,M0,ZIM_LIST,SIG,n_heavy):
     n0=np.log(1/M0)*gam
     def get_seq(n):
