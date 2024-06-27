@@ -32,7 +32,7 @@ Figure 1 Storage- and loss- modulus curves at different fine-tuning stages. The 
 
 ## Note
 
-Ensure that the domains of $log_{10}\omega$, $log_{10}G'$, and $log_{10}G''$ are all within the range of -10 and 10. If not, you can adjust the domain using the following command after the calibration and preceding prediction commands: `-dw 3 -dG 2`.
+Ensure that the domains of $log_{10}\omega$, $log_{10}G'$, and $log_{10}G''$ are all within the range of -10 and 10. If not, you can adjust the domain using the following command after the calibration and preceding prediction commands: `-dw 3 -dG 2`. The molecular weight that is used for calibration should be relatively big in order that the calibration program can capture the information, more precisely, about the entanglement behavior of the studied polymer. 
 
 
 
